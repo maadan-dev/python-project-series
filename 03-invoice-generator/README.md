@@ -236,6 +236,25 @@ Possible improvements include:
 * Automated tests
 * Better invoice ID generation that doesn't depend on the number of stored invoices
 
+## What I Struggled With and How I Fixed It
+
+### Recurring mistakes
+
+* **Trailing commas turning strings into tuples** — this was a recurring Python mistake that I had to catch and correct several times.
+* **Missing commas between function parameters** — another syntax mistake that appeared repeatedly while building the project.
+* **Generating the PDF before finishing the invoice** — I called `generate_pdf()` before the loop had finished collecting the invoice items. The resulting PDF contained no items. I fixed it by understanding the execution order: all items needed to be added to the invoice before the PDF generation step ran.
+
+### Conceptual gaps
+
+* **Managing object state externally** — I initially created a separate `items` list instead of trusting the `Invoice` object to manage its own items through `add_item()`. This showed me that the object should own the state that belongs to it rather than having another part of the program manage that state unnecessarily.
+* **Using the wrong variable for `status`** — I wrote `status == '1'` when I meant to work with `status_choice`. This exposed the difference between comparing a value and actually assigning or using the variable containing the user's input.
+* **Incorrect use of `range()`** — I wrote `range(num_of_items + 1)` while `num_of_items` was still a string from `input()`. There were actually two problems: the value needed to be converted to an integer, and adding `1` produced an extra iteration. Fixing this forced me to pay more attention to both **data types** and **loop boundaries**.
+
+### What these mistakes taught me
+
+The biggest lesson wasn't simply learning the syntax. I started noticing that many bugs came from misunderstanding **who owns the state, what type a value actually is, and when something happens in the program's execution flow**.
+
+
 ## License
 
 This project is for learning and experimentation.
