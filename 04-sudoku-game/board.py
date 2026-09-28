@@ -23,6 +23,10 @@ class Board:
         c = self.validate(val, min_val=1, max_val=9)  # Values are 1-9
         self.board[a][b] = c 
 
+    def is_cell_empty(self, row, col):
+        row = self.validate(row)
+        col = self.validate(col)
+        return self.board[row][col] == 0
+        
     def reset_board(self):
         self.board = [[0] * 9 for _ in range(9)] 
-        return self.board
