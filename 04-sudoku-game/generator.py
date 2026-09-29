@@ -25,7 +25,7 @@ def count_solutions(board):
                         board[row][col] = num
                         count += count_solutions(board)
                         board[row][col] = 0
-                return 0
+                return count  # Fixed: returns accumulated count instead of 0
     return 1
 
 def remove_cells(board):
@@ -47,4 +47,3 @@ def remove_cells(board):
             else:
                 removal_count += 1
         solution_count = 0
-
