@@ -1,101 +1,27 @@
 # Contact Book CLI
 
-A simple command-line contact management application built with Python.
+Command-line contact manager built with Python. Project 1 of my [Python project series](../README.md).
 
-This was the first project in my Python project series. The goal was to practice working with dictionaries, functions, modules, JSON persistence, validation, and basic CRUD operations.
+Goal: practice dictionaries, functions, modules, JSON persistence, validation and basic CRUD.
 
 ## Features
 
-* Add a contact
-* Search contacts by name or phone number
-* Delete contacts
-* Validate Nigerian phone numbers
-* Persist contacts to a JSON file
-* Prevent duplicate contact names
+- Add a contact
+- Search contacts by name or phone number
+- Delete contacts
+- Validate Nigerian phone numbers
+- Persist contacts to a JSON file
+- Prevent duplicate contact names
 
-## Project Structure
-
-```text
-01-contact-book/
-├── actions.py       # Contact operations
-├── main.py          # CLI and user interaction
-├── model.py         # Contact validation
-├── storage.py       # JSON file persistence
-├── contacts.json    # Saved contacts
-├── README.md
-└── DESIGN_NOTES.md
-```
-
-## How It Works
-
-The application stores contacts in a dictionary using the contact name as the key.
-
-Example:
-
-```json
-{
-  "Yekeen": {
-    "phone": "+2348012345678"
-  }
-}
-```
-
-Contact operations are handled separately from the CLI.
-
-`actions.py` contains functions for:
-
-* Adding contacts
-* Searching contacts
-* Deleting contacts
-
-`model.py` validates contact names and phone numbers.
-
-`storage.py` handles loading and saving contacts using JSON.
-
-`main.py` provides the command-line interface.
-
-## Phone Validation
-
-The application currently expects Nigerian phone numbers in this format:
-
-```text
-+234XXXXXXXXXX
-```
-
-The phone number must:
-
-* Start with `+234`
-* Contain 14 characters in total
-* Contain only digits after `+234`
-
-## Running the Project
-
-Make sure Python is installed, then run:
+## Run it
 
 ```bash
+git clone https://github.com/maadan-dev/python-project-series.git
+cd python-project-series/01-contact-book
 python main.py
 ```
 
-The application will create `contacts.json` when contacts are saved.
-
-## Concepts Practiced
-
-This project introduced/practiced:
-
-* Dictionaries
-* Lists and strings
-* Functions
-* Modules and imports
-* Conditional statements
-* Loops
-* JSON
-* File I/O
-* Basic validation
-* CRUD operations
-* Separation of responsibilities
-* Working with persistent data
-
-## Example
+`contacts.json` is created when the first contact is saved.
 
 ```text
 1. Add contact
@@ -110,48 +36,44 @@ Enter phone: +2348012345678
 Contact added
 ```
 
-## Project Status
+## Structure
 
-This is an early learning project and intentionally remains simple.
-
-Later projects in the series build on these concepts and introduce more advanced Python and software engineering concepts.
-
-
-## What I Learned
-
-* How to structure a Python project across multiple files, with each file having a single responsibility.
-* The difference between **validating data** and **acting on data**, and why those responsibilities shouldn't live in the same place.
-* How to read and write JSON files to persist data between program sessions.
-* How a unique-name constraint can influence the choice of data structure: using a dictionary of dictionaries instead of a list of dictionaries makes direct name-based lookups more straightforward.
-* How to apply the **ASSUMES / PROMISES / WILL NOT HANDLE** framework before writing functions. This became the foundation for the approach I later wrote about in my engineering notes.
-
-
-## What I Struggled With and How I Fixed It
-
-### 1. `load_contacts` was missing parentheses
-
-I accidentally assigned the function itself instead of calling it. This meant I was working with a function reference rather than the contacts it was supposed to return, which eventually caused a `TypeError`.
-
-**Fix:** I added `()` to actually execute the function:
-
-```python
-contacts = load_contacts()
+```text
+01-contact-book/
+├── actions.py        # add, search, delete
+├── main.py           # CLI and user interaction
+├── model.py          # name and phone validation
+├── storage.py        # JSON load/save
+├── README.md
+└── DESIGN_NOTES.md
 ```
 
-The important lesson was understanding the difference between **referencing a function** and **calling a function**.
+Contacts are stored in a dictionary keyed by name:
 
-### 2. Using `f.write()` with a dictionary
+```json
+{
+  "Yekeen": {
+    "phone": "+2348012345678"
+  }
+}
+```
 
-I initially tried to use `f.write()` to save the contacts dictionary directly to a file. That doesn't work because `write()` expects a string, not a Python dictionary.
+Phone numbers must start with `+234`, be 14 characters long, and contain only digits after `+234`.
 
-**Fix:** I switched to `json.dump()`, which converts the Python dictionary into JSON and writes it to the file.
+## What I learned
 
-### 3. `contact.json` vs `contacts.json`
+- Structuring a project across files, one responsibility per file
+- Validating data and acting on data are different jobs and shouldn't live in the same place
+- Reading and writing JSON to persist data between runs
+- A unique-name constraint makes a dict of dicts a better fit than a list of dicts, because lookups by name become direct
+- Writing ASSUMES / PROMISES / WILL NOT HANDLE before each function. This became the basis of my [engineering notes](https://maadan.dev/writing)
 
-I had a filename typo where one part of the program used `contact.json` while another used `contacts.json`.
+## What broke, and what fixed it
 
-The program didn't immediately fail — it simply created a second file. That made it look like persistence wasn't working because I was writing to one file and reading from another.
+- **`load_contacts` missing parentheses.** I assigned the function instead of calling it, which caused a `TypeError`. Fix: `contacts = load_contacts()`. Lesson: referencing a function is not calling it.
+- **`f.write()` with a dictionary.** `write()` expects a string. Fixed with `json.dump()`.
+- **`contact.json` vs `contacts.json`.** One part of the program wrote to one file, another read from a different one. No error, just a second file, so persistence looked broken. Some bugs don't crash. The program does exactly what it was told, and the instructions disagree.
 
-**Fix:** I made sure both loading and saving used the same filename.
+## Next
 
-The bigger lesson was that some bugs don't produce an obvious error. Sometimes the program behaves exactly as instructed — the instructions are just inconsistent.
+Project 2: [Study Planner Agent](../02-study-planner).
