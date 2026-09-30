@@ -1,28 +1,45 @@
 def is_valid(board, row, col, num):
-    for i in range(9):
-        # Skip checking the cell against itself
-        if i != col and board[row][i] == num:
-            return False
-        if i != row and board[i][col] == num:
+    """
+    Check whether placing num at board[row][col]
+    would be valid according to Sudoku rules.
+    """
+
+    # Check row
+    for c in range(9):
+        if c != col and board[row][c] == num:
             return False
 
-        box_row = (row // 3) * 3 + (i // 3)
-        box_col = (col // 3) * 3 + (i % 3)
-        # Skip checking the cell against itself in the 3x3 box
-        if (box_row != row or box_col != col) and board[box_row][box_col] == num:
+    # Check column
+    for r in range(9):
+        if r != row and board[r][col] == num:
             return False
+
+    # Check 3x3 box
+    box_row = (row // 3) * 3
+    box_col = (col // 3) * 3
+
+    for r in range(box_row, box_row + 3):
+        for c in range(box_col, box_col + 3):
+            if (r != row or c != col) and board[r][c] == num:
+                return False
 
     return True
 
+
 def is_board_solved(board):
-    for i in range(9):
-        for j in range(9):
-            val = board[i][j]
-            if val == 0:  
+    """
+    Return True if every cell is filled and the entire
+    board satisfies Sudoku rules.
+    """
+
+    for row in range(9):
+        for col in range(9):
+            value = board[row][col]
+
+            if value == 0:
                 return False
-            board[i][j] = 0
-            if not is_valid(board, i, j, val):
-                board[i][j] = val
+
+            if not is_valid(board, row, col, value):
                 return False
-            board[i][j] = val    
+
     return True

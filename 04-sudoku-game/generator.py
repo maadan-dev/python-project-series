@@ -1,49 +1,107 @@
+
+from random import randint, shuffle
+
 from validation import is_valid
-from random import randint as random
+
 
 def sudoku_generator(board):
+    """
+    Generate a complete valid Sudoku board using backtracking.
+    Candidate numbers are shuffled so each generated board
+    is different.
+    """
     for row in range(9):
         for col in range(9):
             if board[row][col] == 0:
-                for num in range(1, 10):
+                numbers = list(range(1, 10))
+                shuffle(numbers)
+
+                for num in numbers:
                     if is_valid(board, row, col, num):
                         board[row][col] = num
 
                         if sudoku_generator(board):
                             return True
+
                         board[row][col] = 0
+
                 return False
+
     return True
 
+
+def remove_cells(board, target_empty=45):
+    """
+    Remove cells while keeping the puzzle uniquely solvable.
+
+    Stops when:
+    - target_empty cells have been removed, or
+    - no more cells can be removed without creating
+      multiple solutions.
+    """
+    removed = 0
+    cells = [
+        (row, col)
+        for row in range(9)
+        for col in range(9)
+    ]
+
+    shuffle(cells)
+
+    for row, col in cells:
+        if removed >= target_empty:
+            break
+
+        value = board[row][col]
+
+        if value == 0:
+            continue
+
+        board[row][col] = 0
+
+        if count_solutions(board) == 1:
+            removed += 1
+        else:
+            board[row][col] = value
+
+    return removed
+
+
 def count_solutions(board):
-    count = 0
-    for row in range(9):
-        for col in range(9):
-            if board[row][col] == 0:
-                for num in range(1, 10):
-                    if is_valid(board, row, col, num):
-                        board[row][col] = num
-                        count += count_solutions(board)
-                        board[row][col] = 0
-                return count  # Fixed: returns accumulated count instead of 0
-    return 1
+    """
+    Count Sudoku solutions, stopping as soon as two are found.
 
-def remove_cells(board):
-    solution_count = 0
-    removal_count = 0
+    Returns:
+        0 -> no solution
+        1 -> exactly one solution
+        2 -> two or more solutions
+    """
+    solutions = 0
 
-    while removal_count <= 45:
+    def solve():
+        nonlocal solutions
 
-        i = random(0, 8)
-        j =  random(0, 8)
-        temp = 0
-        if board[i][j] != 0:
-            temp, board[i][j] = board[i][j], 0
+        if solutions >= 2:
+            return
 
-            solution_count += count_solutions(board)
+        for row in range(9):
+            for col in range(9):
+                if board[row][col] == 0:
+                    for num in range(1, 10):
+                        if is_valid(board, row, col, num):
+                            board[row][col] = num
 
-            if solution_count >= 2:
-                board[i][j] = temp
-            else:
-                removal_count += 1
-        solution_count = 0
+                            solve()
+
+                            board[row][col] = 0
+
+                            if solutions >= 2:
+                                return
+
+                    return
+
+        solutions += 1
+
+    solve()
+
+    return solutions
