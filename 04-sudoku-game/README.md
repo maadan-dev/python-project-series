@@ -1,184 +1,84 @@
-# Sudoku Master — Graphical Sudoku Game
+# Sudoku (Python + Flet)
 
-A modern, interactive Sudoku game built with Python and Flet.
+Desktop Sudoku game with generated puzzles that always have exactly one solution. Project 4 of my [Python project series](../README.md).
 
-This is the fourth project in my Python project series. Unlike the previous CLI projects, this one introduced a graphical interface, recursion, backtracking, puzzle generation, solution counting, state-driven rendering, and event-driven programming.
+<p align="center">
+  <img src="screenshot-light.png" alt="Sudoku light theme" width="48%" />
+  <img src="screenshot-dark.png" alt="Sudoku dark theme" width="48%" />
+</p>
 
-The project lives inside the [python-project-series](https://github.com/maadan-dev/python-project-series) repository alongside the other projects in the series.
+## What it does
 
----
+- Generates a full valid board with recursive backtracking, then removes cells while checking the puzzle still has one solution
+- Four difficulty levels: Easy, Medium, Hard, Expert
+- Undo (history stack), erase, hint, new game
+- Live timer with pause/resume
+- Full keyboard control: `1`-`9` enter, `Backspace`/`Delete` clear, arrows move, `Ctrl+Z` undo, `h` hint, `n` new game
+- Row/column/box and matching-number highlighting
+- Light and dark theme
+- Win dialog with time, difficulty and mistake count
 
-## What the Project Does
+## Run it
 
-A feature-rich Sudoku application with a clean, responsive graphical interface that:
+Tested on Python 3.12.3.
 
-* **Generates Valid Sudoku Puzzles**: Generates a complete valid Sudoku board using recursive backtracking.
-* **Preserves Unique Solutions**: Removes cells based on selected difficulty while ensuring only one unique solution exists.
-* **Multiple Difficulty Levels**: Supports **Easy**, **Medium**, **Hard**, and **Expert** difficulty modes.
-* **3×3 Subgrid Board Layout**: Displays the 9×9 grid visually partitioned into nine distinct 3×3 subgrid blocks.
-* **Smart Cell Highlighting**: 
-  * Selected cell focus with thick accent border.
-  * Soft guide highlighting for the active cell's row, column, and 3×3 block.
-  * Automatic matching-number highlighting across the entire board.
-* **Live Timer & Pause**: Features a live stopwatch timer with pause/resume functionality.
-* **Action Toolbar**:
-  * **Undo**: Reverts moves using a history stack.
-  * **Erase**: Clears user entries on editable cells.
-  * **Hint**: Intelligently reveals the correct number for the selected cell or first empty cell using the solver.
-  * **New Game**: Generates a fresh puzzle instantly.
-* **Interactive Number Pad**: 1–9 digit buttons with remaining count badges (e.g., `4 left`, `✓` when completed).
-* **Keyboard Navigation & Controls**:
-  * Number keys `1`–`9` to enter values.
-  * `Backspace` / `Delete` to clear.
-  * Arrow keys (`ArrowUp`, `ArrowDown`, `ArrowLeft`, `ArrowRight`) to navigate the board.
-  * Shortcuts (`Ctrl+Z` for Undo, `h` for Hint, `n` for New Game).
-* **Light & Dark Theme Toggle**: Dynamic theme switching for comfortable play in any environment.
-* **Victory Celebration**: Displays a celebratory modal dialog with final stats (time, difficulty, mistake count) upon solving the board.
+```bash
+git clone https://github.com/maadan-dev/python-project-series.git
+cd python-project-series/04-sudoku-game
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt  # flet==1.0.2
+python main.py
+```
 
----
-
-## How to Run It
-
-1. **Clone the main project repository:**
-   ```bash
-   git clone https://github.com/maadan-dev/python-project-series.git
-   ```
-
-2. **Enter the Sudoku project directory:**
-   ```bash
-   cd python-project-series/04-sudoku-game
-   ```
-
-3. **Create and activate a virtual environment:**
-   ```bash
-   python -m venv .venv
-   ```
-   * **Linux/macOS:**
-     ```bash
-     source .venv/bin/activate
-     ```
-   * **Windows:**
-     ```cmd
-     .venv\Scripts\activate
-     ```
-
-4. **Install the project dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-5. **Run the game:**
-   ```bash
-   python main.py
-   ```
-
----
-
-## Requirements
-
-* `flet==1.0.2`
-* Python 3.x is required.
-
----
-
-## Project Structure
+## Structure
 
 ```text
 04-sudoku-game/
-├── board.py         # Board state encapsulation & validation
-├── generator.py     # Recursive Sudoku generator & unique solution solver
-├── gui.py           # Flet GUI application, theme palette, & event handlers
-├── main.py          # Application entry point
-├── validation.py     # Core Sudoku rules & completion checking
-├── requirements.txt # Project dependencies (Flet 1.0.2)
-└── README.md        # Project documentation
+├── board.py         # board state, index validation, getters/setters, reset
+├── validation.py    # row/column/box rules, is the board solved
+├── generator.py     # backtracking generator, solution counter, cell removal
+├── gui.py           # Flet UI, theme palette, event handlers, timer, keyboard
+├── main.py          # entry point
+└── requirements.txt
 ```
 
-### Module Responsibilities
+Game logic (`board.py`, `validation.py`, `generator.py`) has no Flet imports. Only `gui.py` touches the UI.
 
-* **`board.py`**: Responsible for the 9×9 Sudoku board state, row/column index validation, cell getters/setters, empty cell checks, and board resetting.
-* **`validation.py`**: Implements pure Sudoku rule checking for rows, columns, and 3×3 boxes, as well as verifying whether the entire board is completely and correctly solved.
-* **`generator.py`**: Handles puzzle generation using recursive backtracking with randomized candidates, solution counting (`count_solutions`), and cell removal to guarantee a unique puzzle solution.
-* **`gui.py`**: Implements the Flet graphical interface (`SudokuApp`), theme palette management (`Palette`), grid layout construction, cell selection logic, visual highlighting, action handlers (Undo, Erase, Hint), numpad, timer, and keyboard shortcuts.
-* **`main.py`**: The application entry point. Initializes the board, generates the starting puzzle, creates the `SudokuApp`, and launches Flet via `ft.run(main)`.
+## What I built by hand vs with AI
 
----
+- **Hand-written:** `board.py`, `validation.py`, `generator.py`, core of `gui.py` (cell input, new game logic, grid initialization)
+- **AI-assisted:** theme palette (`Palette`), subgrid layout polish, keyboard navigation listeners, numpad remaining-count badges, hint solver integration in `gui.py`
 
-## What I Learned
+## What I learned
 
-* How to structure a larger Python project across multiple files with separated responsibilities (board state, validation, generation, UI, application startup).
-* How to represent and manipulate 2D matrix grids using nested Python lists.
-* How classes encapsulate state and methods belonging to an object (`Board`, `SudokuApp`, `Palette`).
-* How recursive backtracking algorithms work by trying values, making recursive calls, and unwinding state when a branch fails.
-* How to count total solutions recursively to ensure puzzle uniqueness.
-* How to separate core game logic from UI rendering using a "Single Source of Truth" design pattern (`update_board_visuals`).
-* How event-driven programming works in Flet, including click events, dropdown/popup selection, and keyboard event listeners (`on_keyboard_event`).
-* How stack-based history (`list.append` and `list.pop`) enables clean Undo functionality.
-* How color palettes, subgrid borders, typography, spacing, and animations transform functional code into a polished application.
+- **Recursive backtracking:** try a value, recurse, undo on failure. See `sudoku_generator` in [`generator.py`](generator.py)
+- **Uniqueness checking:** `count_solutions` counts every solution reachable from a partial board, and `remove_cells` only keeps a removal if the count stays at 1. See [`generator.py`](generator.py)
+- **Logic separate from UI:** the game rules never import Flet, so they can be reasoned about (and later tested) without a window. See [`validation.py`](validation.py)
+- **Redrawing from state:** `update_board_visuals` in [`gui.py`](gui.py) rebuilds the display from board state instead of patching cells one by one
+- **Undo as a stack:** `append` on each move, `pop` to revert. See `undo_move` in [`gui.py`](gui.py)
+- **Closures capture by reference:** why grid callbacks need `lambda e, r=row, c=col: ...` instead of using `row` and `col` directly
 
----
+## What broke, and what fixed it
 
-## What I Struggled With and How I Fixed It
+- **Generator produced the same grid every game:** it tried 1..9 in fixed order, so only the removed cells varied. Found in code review, not by testing. Fixed by shuffling candidate numbers per cell in `sudoku_generator`.
+- **`remove_cells` could loop forever** if no more cells could be removed without breaking uniqueness: fixed by capping the removal loop and having `count_solutions` stop as soon as it finds 2 solutions.
+- **`is_board_solved` false negatives:** each cell was compared against itself and reported a conflict. Fixed by skipping the cell's own coordinates in `is_valid`.
+- **Didn't understand why callbacks used `r=row, c=col`:** traced it until I understood that closures capture variables by reference, so every lambda would otherwise see the last loop value.
+- **Passing `Board` where a 2D list was expected (`board` vs `board.board`):** kept happening, so now I check the type entering every function.
+- **`reset_board` reassigned a local instead of mutating state:** fixed by mutating `self.board` directly.
+- **Flet 1.0.2 callback signatures** (`on_select` vs `on_change`) didn't match what I assumed. Read the method signatures instead of guessing.
 
-1. **Closure Bug in Callbacks**:
-   * *Problem:* I didn't initially understand why the grid callback used `lambda e, r=row, c=col: ...` instead of referencing `row` and `col` directly.
-   * *Fix:* Learned how Python closures capture variables by reference and why loop variables must be bound as default arguments when creating callbacks dynamically in loops.
+## The recurring theme
 
-2. **Recursive Solution Counter**:
-   * *Problem:* I struggled to see how `count_solutions()` accumulated solution counts through recursive branches.
-   * *Fix:* Traced execution trees step-by-step to understand how each recursive branch contributes to the total count before returning.
+I understand the concept, but lose track of what type is actually being passed around: `Board` object vs raw 2D list, `int` vs `str` from user input, function vs callback. Going forward: type hints on function signatures, checked with `pyright`, starting in project 5.
 
-3. **Scope and `reset_board()`**:
-   * *Problem:* Reassigned a local variable inside `reset_board()` instead of mutating the object's actual state.
-   * *Fix:* Paid close attention to mutating object attributes versus reassigning local variable names.
+## Known limitations
 
-4. **Type Confusion (`Board` vs 2D List)**:
-   * *Problem:* Repeatedly passed the `Board` object to functions expecting a raw 2D list (`board.board`).
-   * *Fix:* Adopted the practice of explicitly checking variable types flowing into every function.
+- No automated tests yet
+- Hint reveals the answer for free, with no score or time penalty
+- Game state is not saved between restarts
 
-5. **`is_board_solved()` False Negatives**:
-   * *Problem:* Validation logic caused the cell currently being checked to report a conflict with itself.
-   * *Fix:* Ensured validation logic skips matching cell coordinates `(r != row or c != col)`.
+## Next
 
-6. **Flet Event Wiring & API Compatibility**:
-   * *Problem:* Ran into argument mismatch issues on event callbacks (e.g. `on_select` vs `on_change` in Flet 1.0.2).
-   * *Fix:* Inspected framework method signatures and aligned callback parameters with event payloads.
-
----
-
-## Concepts Practiced
-
-* Python OOP & Class Architecture
-* Object State & Encapsulation
-* 2D Matrix Grid Manipulation
-* Scope & Closures (`lambda` default arguments)
-* Recursive Backtracking Algorithms
-* Solution Counting & Uniqueness Verification
-* Exception Handling & Type Conversion
-* Event-Driven GUI Programming with Flet 1.0.2
-* Keyboard Event Listening (`on_keyboard_event`)
-* Undo History Stack (`append` / `pop`)
-* Theme Palette Management (Light/Dark Mode)
-* State Synchronization & Visual Highlighting
-
----
-
-## Status
-
-This is a learning project built as part of my Python Project Series to master key programming concepts while creating a fully playable application.
-
----
-
-## Part of the Python Project Series
-
-This project is **Project 4** in my Python project series. The series tracks my progression from CLI utilities to full GUI and API applications.
-
-👉 [View the full Python Project Series](https://github.com/maadan-dev/python-project-series)
-
----
-
-## What's Next?
-
-**Project 5 — Invoice API**  
-Next up: turning invoice generation concepts into a backend API.  
-→ [Project 5 — Invoice API](https://github.com/maadan-dev/python-project-series/05-invoice-api)
+Project 5: Invoice API (planned).
