@@ -1,16 +1,21 @@
 import sqlite3
 
-from models import Invoice, LineItem
+from pathlib import Path
+from models import Invoice, LineItem, InvoiceOut
+
+DB_PATH = Path(__file__).parent / "invoices.db"
 
 def init_db():
-    conn = sqlite3.connect("invoices.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.execute("PRAGMA foreign_keys = ON")
     cur = conn.cursor()
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS invoices (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            client_name TEXT NOT NULL
+            client_name TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            status TEXT NOT NULL DEFAULT 'unpaid' CHECK (status IN ('unpaid', 'paid'))
         )
     """)
 
@@ -29,7 +34,7 @@ def init_db():
     conn.close()
 
 def save_invoice(invoice: Invoice) -> int:
-    conn = sqlite3.connect("invoices.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.execute("PRAGMA foreign_keys = ON")
     cur = conn.cursor()
 
@@ -60,17 +65,17 @@ def save_invoice(invoice: Invoice) -> int:
     finally:
         conn.close()
 
-def get_invoice(invoice_id: int) -> Invoice | None:
-    conn = sqlite3.connect("invoices.db")
+def get_invoice(invoice_id: int) -> InvoiceOut | None:
+    conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
     try:
-        cur.execute("SELECT client_name FROM invoices WHERE id = ?", (invoice_id,))
+        cur.execute("SELECT id, client_name, created_at, status FROM invoices WHERE id = ?", (invoice_id,))
         invoice_row = cur.fetchone()
         if invoice_row is None:
             return None
 
-        client_name = invoice_row[0]
+        id_, client_name, created_at, status = invoice_row
 
         cur.execute(
             "SELECT description, quantity, unit_price FROM line_items WHERE invoice_id = ?", 
@@ -83,6 +88,12 @@ def get_invoice(invoice_id: int) -> Invoice | None:
             for row in items_row
         ]
 
-        return Invoice(client_name=client_name, items=items)
+        return InvoiceOut(
+            id=id_,
+            client_name=client_name,
+            created_at=created_at,
+            status=status,
+            items=items,
+        )
     finally:
         conn.close()

@@ -23,3 +23,8 @@ class Invoice(BaseModel):
         min_length=1,
         description="Items"
     )
+
+class InvoiceOut(Invoice):
+    id: int
+    created_at: str
+    status: str

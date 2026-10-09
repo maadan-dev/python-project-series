@@ -1,35 +1,9 @@
-import os
-from database import init_db, save_invoice, get_invoice
-from models import Invoice, LineItem
+from database import get_invoice
+from pdf_generator import generate_pdf, invoice_to_pdf_dict
 
-if os.path.exists("invoices.db"):
-    os.remove("invoices.db")
-
-init_db()
-
-test_invoice1 = Invoice(
-    client_name="Acme Corp",
-    items=[
-        LineItem(description="Web Design", quantity=1, unit_price=500.0),
-        LineItem(description="Hosting", quantity=12, unit_price=15.0),
-    ],
-)
-test_invoice2 = Invoice(
-    client_name="Bolu stores",
-    items=[
-        LineItem(description="chair", quantity=2, unit_price=500.0),
-        LineItem(description="table", quantity=2, unit_price=15.0),
-        LineItem(description="Stool", quantity=2, unit_price=10.0),
-    ],
-)
-
-save_invoice(test_invoice1)
-save_invoice(test_invoice2)
-
-print("get_invoice(1):")
-print(get_invoice(1))
-
-print("-" * 40)
-
-print("get_invoice(2):")
-print(get_invoice(2))
+invoice = get_invoice(1)
+if invoice:
+    pdf_dict = invoice_to_pdf_dict(invoice)
+    generate_pdf(pdf_dict)
+    print("Date shown:", pdf_dict["date"])
+    print("Total shown:", pdf_dict["total"])
