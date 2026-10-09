@@ -25,3 +25,6 @@ env/
 contacts.json
 history.json
 invoice.json
+
+# Database
+*.db
