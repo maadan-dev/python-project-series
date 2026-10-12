@@ -5,30 +5,8 @@ from models import InvoiceOut
 invoice_dir = Path(__file__).parent / "invoices"
 invoice_dir.mkdir(exist_ok=True)
 
-def invoice_to_pdf_dict(invoice: InvoiceOut) -> dict:
-    items = [
-        {
-            "description": item.description,
-            "quantity": item.quantity,
-            "total": item.quantity * item.unit_price,
-        }
-        for item in invoice.items
-    ]
 
-    grand_total = sum(item["total"] for item in items)
-
-    date_only = invoice.created_at.split(" ")[0]
-
-    return {
-        "invoice_id": invoice.id,
-        "name": invoice.client_name,
-        "date": date_only,
-        "status": invoice.status,
-        "items": items,
-        "total": grand_total,
-    }
-
-def generate_pdf(invoice_dict):
+def generate_pdf(invoice_dict: dict) -> Path:
     name = invoice_dict["name"]
     items = [item for item in invoice_dict["items"]]
     status = invoice_dict["status"]
@@ -36,8 +14,8 @@ def generate_pdf(invoice_dict):
     id = invoice_dict["invoice_id"]
     total = invoice_dict["total"]
 
-    FILE_PATH = str(invoice_dir / f"INV-{id}.pdf")
-    c = canvas.Canvas(FILE_PATH, pagesize=(595.27, 841.89))
+    file_path = invoice_dir / f"INV-{id}.pdf"
+    c = canvas.Canvas(str(file_path), pagesize=(595.27, 841.89))
     bold = "Helvetica-Bold"
     normal = "Helvetica"
     c.setFont(bold, 14)
@@ -86,3 +64,27 @@ def generate_pdf(invoice_dict):
 
     c.showPage()
     c.save()
+
+    return file_path
+
+def invoice_to_pdf_dict(invoice: InvoiceOut) -> dict:
+    items = [
+        {
+            "description": item.description,
+            "quantity": item.quantity,
+            "total": item.quantity * item.unit_price,
+        }
+        for item in invoice.items
+    ]
+
+    grand_total = sum(item["total"] for item in items)
+    date_only = invoice.created_at.split(" ")[0]
+
+    return {
+        "invoice_id": invoice.id,
+        "name": invoice.client_name,
+        "date": date_only,
+        "status": invoice.status,
+        "items": items,
+        "total": grand_total,
+    }
