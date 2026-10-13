@@ -20,6 +20,7 @@ env/
 
 # Generated files
 *.pyc
+invoices/
 
 # Runtime data
 contacts.json
